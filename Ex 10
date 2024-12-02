@@ -1,0 +1,10 @@
+10. a. Find the Second Highest Distinct Salary
+Using a subquery to find the second-highest salary:
+SELECT MAX(Salary) AS SecondHighestSalary FROM Employee WHERE Salary < (SELECT MAX(Salary) FROM Employee);
+10. b. Using DISTINCT() and ORDER BY
+SELECT DISTINCT Salary FROM Employee
+ORDER BY Salary DESC LIMIT 1 OFFSET 1;
+10. c. Count the Number of Rows in the Table
+SELECT COUNT(*) AS RowCount FROM Employee;
+10. d. Add a Column to the Employee Table
+ALTER TABLE Employee ADD Age INT;
