@@ -1,0 +1,415 @@
+1.-- Create Person Table
+CREATE TABLE Person ( 
+    personId INT PRIMARY KEY,          -- Primary Key 
+    lastName VARCHAR(50) NOT NULL,     -- Not Null Constraint 
+    firstName VARCHAR(50) NOT NULL     -- Not Null Constraint 
+); 
+
+-- Create Address Table
+CREATE TABLE Address ( 
+    addressId INT PRIMARY KEY,         
+    personId INT,                      
+    city VARCHAR(50) NOT NULL,         
+    state VARCHAR(50) NOT NULL,        
+    FOREIGN KEY (personId) REFERENCES Person(personId) -- Foreign Key Constraint 
+);
+
+-- Insert Data into Person
+INSERT INTO Person (personId, lastName, firstName)  
+VALUES  
+(1, 'Doe', 'John'), 
+(2, 'Smith', 'Jane'), 
+(3, 'Brown', 'Charlie'); 
+
+-- Insert Data into Address
+INSERT INTO Address (addressId, personId, city, state)  
+VALUES  
+(1, 1, 'New York', 'NY'), 
+(2, 2, 'Los Angeles', 'CA'); 
+
+-- Update Row
+UPDATE Person 
+SET lastName = 'Johnson' 
+WHERE personId = 1; 
+
+-- Delete Row
+DELETE FROM Address 
+WHERE addressId = 2;
+
+
+
+1b.-- Use LEFT JOIN to combine Person and Address tables
+SELECT  
+    p.personId,  
+    p.firstName,  
+    p.lastName,  
+    a.city,  
+    a.state 
+FROM  
+    Person p 
+LEFT JOIN  
+    Address a ON p.personId = a.personId;
+
+
+
+
+1c-- Report first name, last name, city, and state with NULL for missing addresses
+SELECT  
+    firstName,  
+    lastName,  
+    city,  
+    state 
+FROM  
+    Person p 
+LEFT JOIN  
+    Address a ON p.personId = a.personId;
+
+
+
+
+
+
+
+
+2a.
+-- Create Department Table
+CREATE TABLE Department ( 
+    departmentId INT PRIMARY KEY,      -- Primary Key 
+    departmentName VARCHAR(50) NOT NULL -- Not Null Constraint 
+);
+
+-- Create Employee Table
+CREATE TABLE Employee ( 
+    id INT PRIMARY KEY,                
+    name VARCHAR(50) NOT NULL,        
+    salary INT NOT NULL,              
+    managerId INT,                    
+    departmentId INT,                 
+    FOREIGN KEY (managerId) REFERENCES Employee(id) ON DELETE SET NULL, -- Self-referencing Foreign Key 
+    FOREIGN KEY (departmentId) REFERENCES Department(departmentId) ON DELETE CASCADE -- Department relation 
+);
+
+-- Insert Data into Department
+INSERT INTO Department (departmentId, departmentName)  
+VALUES  
+(1, 'HR'), 
+(2, 'Engineering'), 
+(3, 'Sales');
+
+-- Insert Data into Employee
+INSERT INTO Employee (id, name, salary, managerId, departmentId)  
+VALUES  
+(1, 'Alice', 120000, NULL, 1),   
+(2, 'Bob', 80000, 1, 2),         
+(3, 'Charlie', 90000, 1, 3),     
+(4, 'David', 110000, 3, 3),      
+(5, 'Eve', 95000, 2, 2);
+
+
+
+2b.
+-- Query to find employees who earn more than their managers
+SELECT  
+    e.name AS EmployeeName, 
+    e.salary AS EmployeeSalary, 
+    m.name AS ManagerName, 
+    m.salary AS ManagerSalary 
+FROM  
+    Employee e 
+LEFT JOIN  
+    Employee m ON e.managerId = m.id 
+WHERE  
+    e.salary > m.salary;
+
+
+3.a.
+-- Select employees with salary greater than 50,000
+SELECT id, salary 
+FROM Employee 
+WHERE salary > 50000;
+
+-- Select employees with salary between 30,000 and 100,000
+SELECT id, salary 
+FROM Employee 
+WHERE salary BETWEEN 30000 AND 100000;
+
+-- Select the employee with the minimum salary
+SELECT id, salary 
+FROM Employee 
+WHERE salary = (SELECT MIN(salary) FROM Employee);
+
+-- Aggregate functions
+SELECT SUM(salary) AS TotalSalary 
+FROM Employee;
+
+SELECT COUNT(*) AS HighEarners 
+FROM Employee 
+WHERE salary > 70000;
+
+SELECT AVG(salary) AS AverageSalary 
+FROM Employee;
+
+SELECT MAX(salary) AS MaxSalary 
+FROM Employee;
+
+
+
+3.b
+-- Query to find the second highest distinct salary
+SELECT MAX(salary) AS SecondHighestSalary 
+FROM Employee 
+WHERE salary < (SELECT MAX(salary) FROM Employee);
+
+
+
+3c.
+-- Create function to find Nth highest salary
+CREATE FUNCTION getNthHighestSalary(N INT) RETURNS INT 
+BEGIN 
+    RETURN ( 
+        SELECT DISTINCT salary 
+        FROM Employee 
+        ORDER BY salary DESC 
+        LIMIT 1 OFFSET N-1 
+    ); 
+END;
+
+-- Usage example
+SELECT getNthHighestSalary(2) AS SecondHighestSalary; -- For the 2nd highest salary
+SELECT getNthHighestSalary(3) AS ThirdHighestSalary;  -- For the 3rd highest salary
+
+
+
+
+4.a
+-- Find duplicate emails
+SELECT email 
+FROM Person 
+GROUP BY email 
+HAVING COUNT(email) > 1;
+
+-- Join operation to identify duplicate emails
+SELECT p1.id AS DuplicateID, p2.email AS DuplicateEmail 
+FROM Person p1 
+JOIN Person p2 ON p1.email = p2.email AND p1.id != p2.id;
+
+4.b. Report All Duplicate Emails 
+SELECT email 
+FROM Person 
+GROUP BY email 
+HAVING COUNT(*) > 1; 
+
+
+4.c
+-- Add a new column to the Person table
+ALTER TABLE Person 
+ADD COLUMN name VARCHAR(100);
+
+
+
+4d-- Rename the table from Person to Employee
+ALTER TABLE Person 
+RENAME TO Employee;
+
+4e.
+-- Drop the Person table
+DROP TABLE Person;
+
+
+
+5.a
+-- Find customers who never ordered anything
+SELECT name 
+FROM Customers 
+WHERE id NOT IN (SELECT customerId FROM Orders);
+
+-- Find all customers who placed orders (joined with Orders)
+SELECT c.name 
+FROM Customers c 
+JOIN Orders o ON c.id = o.customerId;
+
+-- Count total number of orders placed
+SELECT COUNT(*) AS TotalOrders 
+FROM Orders;
+
+-- Count number of customers who placed at least one order
+SELECT COUNT(DISTINCT customerId) AS CustomersWithOrders 
+FROM Orders;
+
+
+
+6.a.
+-- Query to find employees with the highest salary in each department
+SELECT d.name AS DepartmentName, e.name AS EmployeeName, e.salary 
+FROM Employee e 
+JOIN Department d ON e.departmentId = d.id 
+WHERE e.salary = ( 
+    SELECT MAX(salary) 
+    FROM Employee 
+    WHERE departmentId = e.departmentId 
+);
+
+6.b.
+-- Query to find the maximum salary for each department
+SELECT d.name AS DepartmentName, MAX(e.salary) AS MaxSalary 
+FROM Employee e 
+JOIN Department d ON e.departmentId = d.id 
+GROUP BY d.name;
+.c. Use a Subquery with GROUP BY 
+SELECT d.name AS DepartmentName, e.name AS EmployeeName, e.salary 
+FROM Employee e 
+JOIN Department d ON e.departmentId = d.id 
+WHERE (e.departmentId, e.salary) IN ( 
+SELECT departmentId, MAX(salary) 
+FROM Employee 
+GROUP BY departmentId 
+);
+
+
+5.a. Subqueries and Simple Join Operations 
+SELECT name 
+FROM Customers 
+WHERE id IN (SELECT customerId FROM Orders); 
+SELECT name 
+FROM Customers 
+WHERE id NOT IN (SELECT customerId FROM Orders); 
+SELECT c.name, o.id AS OrderID 
+FROM Customers c 
+LEFT JOIN Orders o ON c.id = o.customerId; 
+SELECT c.name 
+FROM Customers c 
+LEFT JOIN Orders o ON c.id = o.customerId 
+WHERE o.id IS NULL; 
+5.b. Find Customers Who Never Ordered Anything 
+SELECT name 
+FROM Customers 
+WHERE id NOT IN (SELECT customerId FROM Orders); 
+SELECT c.name 
+FROM Customers c 
+LEFT JOIN Orders o ON c.id = o.customerId 
+WHERE o.id IS NULL; 
+5.c. Count the Total Number of Orders Placed 
+QSELECT COUNT(*) AS TotalOrders 
+FROM Orders;
+
+
+
+
+
+
+7.a. Find Employees With the Highest Salary in Each Department 
+SELECT d."Department name" AS DepartmentName, e.name AS EmployeeName, 
+e.salary 
+FROM Employee e 
+JOIN department d ON e.departmentid = d.departmentid 
+WHERE e.salary = ( 
+SELECT MAX(salary) 
+FROM Employee 
+WHERE departmentid = e.departmentid 
+); 
+7.b. Employees Who Have Worked With the Most Number of Employees 
+SELECT e1.name AS EmployeeName, COUNT(DISTINCT e2.id) AS ColleaguesCount 
+FROM Employee e1 
+JOIN Employee e2 ON e1.id != e2.id AND e1.managerId = e2.managerId 
+GROUP BY e1.name 
+ORDER BY ColleaguesCount DESC 
+LIMIT 1; 
+7.c. Find All Employees Who Have the Same Salary as Any Manager 
+SELECT e.name AS EmployeeName, e.salary 
+FROM Employee e 
+WHERE e.salary IN ( 
+SELECT DISTINCT salary 
+FROM Employee 
+WHERE id IN (SELECT DISTINCT managerId FROM Employee WHERE managerId IS 
+NOT NULL) 
+); 
+7.d. Find Employees Who Do Not Have a Manager 
+SELECT name AS EmployeeName 
+FROM Employee 
+WHERE managerId IS NULL; 
+ 
+7.e. Find Employees Who Earn More Than Their Managers 
+SELECT e.name AS EmployeeName, e.salary, m.name AS ManagerName, m.salary AS 
+ManagerSalary 
+FROM Employee e 
+JOIN Employee m ON e.managerId = m.id 
+WHERE e.salary > m.salary;
+
+
+
+
+
+
+8.a. Combine Two Tables 
+SELECT p.firstName, p.lastName, a.city, a.state 
+FROM Person p 
+LEFT JOIN Address a ON p.personId = a.personId; 
+8.b. Report the First Name, Last Name, City, and State of Each Person (Including Nulls) 
+SELECT p.firstName, p.lastName, a.city, a.state 
+FROM Person p 
+LEFT JOIN Address a ON p.personId = a.personId; 
+8.c. Find Persons Who Live in a Specific City 
+SELECT p.firstName, p.lastName, a.city 
+FROM Person p 
+JOIN Address a ON p.personId = a.personId 
+WHERE a.city = 'SpecificCityName'; 
+8.d. Find the Number of Persons in Each City 
+SELECT a.city, COUNT(p.personId) AS NumberOfPersons 
+FROM Address a 
+JOIN Person p ON p.personId = a.personId 
+GROUP BY a.city;
+
+
+
+
+
+
+
+
+9.a.
+
+-- Report all duplicate emails
+SELECT email 
+FROM Person 
+GROUP BY email 
+HAVING COUNT(email) > 1;
+
+.b. Using COUNT() with GROUP BY 
+SELECT email, COUNT(email) AS EmailCount 
+FROM Person 
+GROUP BY email; 
+
+c. Using GROUP BY with HAVING Clause 
+SELECT email, COUNT(email) AS EmailCount 
+FROM Person 
+GROUP BY email 
+HAVING COUNT(email) > 1;
+
+d. Truncate Table Person 
+TRUNCATE TABLE Person; 
+
+
+
+9.d.-- Truncate the Person table (removes all rows)
+TRUNCATE TABLE Person;
+
+
+
+
+10.a.SELECT MAX(salary) AS SecondHighestSalary 
+FROM Employee 
+WHERE salary < (SELECT MAX(salary) FROM Employee); 
+
+10.b.SELECT DISTINCT salary 
+FROM Employee 
+ORDER BY salary DESC 
+LIMIT 1 OFFSET 1;
+
+10.c. Count the Number of Rows in the Table 
+SELECT COUNT(*) AS NumberOfRows 
+FROM Employee; 
+
+10.d. Add a Column to the Employee Table 
+ALTER TABLE Employee 
+ADD COLUMN name VARCHAR(100); 
+
