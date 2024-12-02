@@ -1,0 +1,23 @@
+5. a. Query Database Tables Using Subqueries and Joins
+Find Customers with Orders:
+SELECT * FROM Customer WHERE CustomerId IN (SELECT CustomerId FROM Orders);
+Find Customers Without Orders:
+SELECT * FROM Customer WHERE CustomerId NOT IN (SELECT CustomerId FROM Orders);
+Using Joins:
+Inner Join to Show Customer Orders:
+SELECT c.CustomerId, c.Name, o.OrderId, o.OrderDate FROM Customer c INNER JOIN Orders o ON c.CustomerId = o.CustomerId;
+Left Join to Include Customers Without Orders:
+SELECT c.CustomerId, c.Name, o.OrderId FROM Customer c LEFT JOIN Orders o ON c.CustomerId = o.CustomerId;
+5. b. Find All Customers Who Never Ordered Anything
+To find customers with no orders using a LEFT JOIN:
+SELECT c.CustomerId, c.Name FROM Customer c LEFT JOIN Orders o ON c.CustomerId = o.CustomerId WHERE o.OrderId IS NULL;
+Alternatively, using a subquery:
+SELECT CustomerId, Name FROM Customer WHERE CustomerId NOT IN (SELECT CustomerId FROM Orders);
+5. c. Count the Total Number of Orders Placed by All Customers
+SELECT COUNT(*) AS TotalOrders FROM Orders;
+5. d. Count the Number of Customers Who Have Placed At Least One Order
+Using a COUNT DISTINCT:
+SELECT COUNT(DISTINCT CustomerId) AS CustomersWithOrders FROM Orders;
+Alternatively, using a JOIN:
+SELECT COUNT(DISTINCT c.CustomerId) AS CustomersWithOrders FROM Customer c
+INNER JOIN Orders o ON c.CustomerId = o.CustomerId;
