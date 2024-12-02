@@ -1,0 +1,10 @@
+6. a. Find Employees Who Have the Highest Salary in Each Department
+SELECT e.EmployeeId, e.Name, e.DepartmentId, e.Salary FROM Employee e
+WHERE e.Salary = (SELECT MAX(Salary)FROM Employee WHERE DepartmentId = e.DepartmentId);
+
+6. b. Find the Maximum Salary for Each Department
+SELECT DepartmentId, MAX(Salary) AS MaxSalary FROM Employee GROUP BY DepartmentId;
+
+6. c. Use Subquery with GROUP BY
+To combine the two solutions, we can use a correlated subquery and GROUP BY:
+SELECT e.EmployeeId, e.Name, e.DepartmentId, e.Salary FROM Employee eWHERE e.Salary IN (SELECT MAX(Salary)FROM EmployeeGROUP BY DepartmentId);
