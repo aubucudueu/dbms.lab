@@ -1,0 +1,16 @@
+8. a. Combine Two Tables
+To combine two tables, you can use JOIN operations. 
+Assume two tables:
+Person: Contains PersonId, FirstName, and LastName.
+Address: Contains PersonId, City, and State.
+Join Example:
+SELECT p.PersonId, p.FirstName, p.LastName, a.City, a.State FROM Person p
+LEFT JOIN Address a ON p.PersonId = a.PersonId;
+8. b. Report First Name, Last Name, City, and State (Include NULL for Missing Addresses)
+SELECT p.FirstName, p.LastName, a.City, a.State FROM Person p
+LEFT JOIN Address a ON p.PersonId = a.PersonId;
+8. c. Find Persons Who Live in a Specific City
+Assume the city is "New York":
+SELECT p.FirstName, p.LastName FROM Person p INNER JOIN Address a ON p.PersonId = a.PersonId WHERE a.City = 'New York';
+8. d. Find the Number of Persons in Each City
+SELECT a.City, COUNT(p.PersonId) AS NumberOfPersons FROM Address a JOIN Person p ON a.PersonId = p.PersonId GROUP BY a.City;
