@@ -1,0 +1,18 @@
+4. a. Query the Database Using Subqueries and Joins
+Using Subqueries:
+SELECT * FROM Employee WHERE Salary > (SELECT AVG(Salary) FROM Employee);
+SELECT * FROM Employee WHERE ManagerId IS NOT NULL;
+SELECT * FROM Employee WHERE EmployeeId NOT IN (SELECT PersonId FROM Address);
+Using Simple Joins:
+SELECT e.EmployeeId, e.Name, e.Salary, a.City, a.State FROM Employee e
+LEFT JOIN Address a ON e.EmployeeId = a.PersonId;
+SELECT e.Name AS EmployeeName, m.Name AS ManagerName FROM Employee eINNER JOIN Employee m ON e.ManagerId = m.EmployeeId;
+4. b. Find Duplicate Emails
+If the Email column exists in the Employee table:
+SELECT Email, COUNT(*) AS Count FROM Employee GROUP BY Email HAVING COUNT(*) > 1;
+4. c. Add a Column to the Person Table
+ALTER TABLE Person ADD Age INT;
+4. d. Rename the Person Table to Employee
+ALTER TABLE Person RENAME TO Employee;
+4. e. Drop the Person Table
+DROP TABLE Person;
