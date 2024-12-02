@@ -1,0 +1,8 @@
+9. a. Report All Duplicate Emails
+SELECT Email, COUNT(*) AS EmailCount FROM Person GROUP BY Email HAVING COUNT(*) > 1;
+9. b. Using COUNT() with GROUP BY
+SELECT Email, COUNT(*) AS EmailCount FROM Person GROUP BY Email;
+9. c. Using GROUP BY with HAVING Clause
+SELECT Email FROM Person GROUP BY Email HAVING COUNT(*) > 1;
+9. d. Truncate the Table Person
+TRUNCATE TABLE Person;
