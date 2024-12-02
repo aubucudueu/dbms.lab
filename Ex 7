@@ -1,0 +1,16 @@
+7. a. Find Employees With the Highest Salary in Each Department
+SELECT e.EmployeeId, e.Name, e.DepartmentId, e.Salary FROM Employee e WHERE e.Salary = (SELECT MAX(Salary)FROM Employee WHERE DepartmentId = e.DepartmentId);
+
+7. b. Employees Who Have Worked With the Most Number of Employees
+Assume a table WorksOn exists to track which employees worked on which projects:
+SELECT w1.EmployeeId, COUNT(DISTINCT w2.EmployeeId) AS ColleagueCountFROM WorksOn w1 JOIN WorksOn w2 ON w1.ProjectId = w2.ProjectId AND w1.EmployeeId != w2.EmployeeId GROUP BY w1.EmployeeId ORDER BY ColleagueCount DESC LIMIT 1;
+
+7. c. Find All Employees Who Have the Same Salary as Any Manager
+Assume the ManagerId column in the Employee table identifies managers.
+SELECT e.EmployeeId, e.Name, e.Salary FROM Employee e WHERE e.Salary IN (SELECT DISTINCT Salary FROM Employee WHERE EmployeeId IN (SELECT DISTINCT ManagerId FROM Employee));
+
+7. d. Find Employees Who Do Not Have a Manager
+SELECT EmployeeId, Name FROM Employee WHERE ManagerId IS NULL;
+
+7. e. Find Employees Who Earn More Than Their Managers
+SELECT e.EmployeeId, e.Name, e.Salary, m.Name AS ManagerName, m.Salary AS ManagerSalary FROM Employee e JOIN Employee m ON e.ManagerId = m.EmployeeId WHERE e.Salary > m.Salary;
