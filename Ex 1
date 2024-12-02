@@ -1,0 +1,34 @@
+ a. Create a Database Table with Constraints, and Perform DML Operations
+Create the Table:
+CREATE TABLE Person (
+    PersonId INT PRIMARY KEY,           -- Primary key constraint
+    FirstName VARCHAR(50) NOT NULL,     -- Not Null constraint
+    LastName VARCHAR(50) NOT NULL       -- Not Null constraint
+);
+CREATE TABLE Address (
+    AddressId INT PRIMARY KEY,          -- Primary key constraint
+    PersonId INT UNIQUE NOT NULL,       -- Unique and Not Null constraints
+    City VARCHAR(100) NOT NULL,         -- Not Null constraint
+    State VARCHAR(100) NOT NULL,        -- Not Null constraint
+    FOREIGN KEY (PersonId) REFERENCES Person(PersonId) -- Foreign key constraint
+);
+Insert Rows:
+INSERT INTO Person (PersonId, FirstName, LastName)
+VALUES (1, 'John', 'Doe'), (2, 'Jane', 'Smith'), (3, 'Alice', 'Brown');
+INSERT INTO Address (AddressId, PersonId, City, State)
+VALUES (1, 1, 'New York', 'NY'), (2, 2, 'Los Angeles', 'CA');
+Update a Row:
+UPDATE Address
+SET City = 'San Francisco'
+WHERE AddressId = 2;
+Delete a Row:
+DELETE FROM Person
+WHERE PersonId = 3;
+
+1. b. Combine Two Tables
+Use an INNER JOIN to combine data from both tables based on the PersonId:
+SELECT p.PersonId, p.FirstName, p.LastName, a.City, a.StateFROM Person p INNER JOIN Address a ON p.PersonId = a.PersonId;
+
+1. c. Solution for Reporting First Name, Last Name, City, and State
+To retrieve the requested information, use a LEFT JOIN:
+SELECT p.FirstName, p.LastName, a.City, a.State FROM Person p LEFT JOIN Address a ON p.PersonId = a.PersonId;
